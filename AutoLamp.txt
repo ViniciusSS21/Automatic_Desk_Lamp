@@ -1,0 +1,111 @@
+const int red = 3, yel = 5, gre = 6;
+const int bt_liga = 7, bt_modo = 8;
+
+int ldr, valor_liga, valor_modo;
+bool ligado = false, ueb_liga = false, ueb_modo = false;
+char modo = 'a'; //modo pode ser == g, y, r
+
+bool OnOff();
+char iluminacao();
+void ilumina(int ldr, char ilu);
+void desligar();
+
+bool OnOff(){ //liga ou desliga a iluminaria
+  valor_liga = digitalRead(bt_liga);
+  if(valor_liga == 1 && ueb_liga == false){
+    ligado = !ligado;
+  }
+  ueb_liga = valor_liga;
+  return ligado;
+}
+
+char iluminacao(){ //ajusta o tipo de iluminação
+  valor_modo = digitalRead(bt_modo);
+  if(valor_modo == 1 && ueb_modo == false){
+   if(modo == 'a'){
+      modo = 'g';
+      
+    }else if(modo == 'g'){
+      modo = 'y';
+      
+    }else if(modo == 'y'){
+      modo = 'r';
+    }else{
+      modo = 'a';
+    }
+  }
+  ueb_modo = valor_modo;
+  return modo;
+}
+
+void ilumina(int ldr, char ilu){
+  if(ilu == 'a'){ //a==automatico
+  if(ldr > 350){
+    digitalWrite(gre, HIGH);
+    digitalWrite(yel, LOW);
+    digitalWrite(red, LOW);
+  }else if(ldr < 230){
+    digitalWrite(gre, LOW);
+    digitalWrite(yel, LOW);
+    digitalWrite(red, HIGH);
+  }else{
+    digitalWrite(gre, LOW);
+    digitalWrite(yel, HIGH);
+    digitalWrite(red, LOW);
+  }}else if(ilu == 'g'){
+      digitalWrite(gre, HIGH);
+      digitalWrite(yel, LOW);
+      digitalWrite(red, LOW);
+  }else if(ilu == 'y'){
+      digitalWrite(gre, LOW);
+      digitalWrite(yel, HIGH);
+      digitalWrite(red, LOW);
+  }else{
+      digitalWrite(gre, LOW);
+      digitalWrite(yel, LOW);
+      digitalWrite(red, HIGH);
+  }
+}
+
+void desligar(){
+  digitalWrite(gre, LOW);
+  digitalWrite(yel, LOW);
+  digitalWrite(red, LOW);
+}
+
+
+
+void setup() {
+
+  pinMode(red, OUTPUT);
+  pinMode(yel, OUTPUT);
+  pinMode(gre, OUTPUT);
+
+  pinMode(bt_modo, INPUT);
+  pinMode(bt_liga, INPUT);  
+  Serial.begin(9600);
+
+}
+
+
+
+void loop() {
+  bool ligar = OnOff();
+  
+  if(ligar == true){
+    Serial.println("ligado");
+    ldr = analogRead(A0);
+    char ilu = iluminacao();
+    Serial.println(ilu);
+    ilumina(ldr, ilu);
+
+  }else {
+    ldr = 0;
+    modo = 'a';
+    desligar();
+    Serial.println("desligado");
+  }
+  Serial.println(ldr);
+  delay(20);
+
+}
